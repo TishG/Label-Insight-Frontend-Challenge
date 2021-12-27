@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 
 import './App.css';
 
+import Jumbotron from './Jumbotron';
+
 const App = () => {
   const [photos, setPhotos] = useState([]);
 
@@ -16,10 +18,10 @@ const App = () => {
 
   return (
     <div className="App">
-      <h1>My Photo Gallery</h1>
+      <Jumbotron title="My Photo Gallery" />
       <div className="container gallery">
         <div className="grid">
-          {photos.length ? 
+          {photos.length ? (
             photos.map((photo) => (
               <img
                 key={photo.title}
@@ -27,23 +29,26 @@ const App = () => {
                 className="img-thumbnail border g-col"
                 alt={photo.title}
               />
-            )
-          ) : <div className="container"><div class="spinner-grow text-success" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <div class="spinner-grow text-danger" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <div class="spinner-grow text-success" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <div class="spinner-grow text-danger" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <div class="spinner-grow text-success" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-</div> }
+            ))
+          ) : (
+            <div className="container">
+              <div class="spinner-grow text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <div class="spinner-grow text-danger" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <div class="spinner-grow text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <div class="spinner-grow text-danger" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <div class="spinner-grow text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
