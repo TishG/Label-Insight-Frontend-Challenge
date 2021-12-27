@@ -7,13 +7,17 @@ import Jumbotron from './Jumbotron';
 const App = () => {
   const [photos, setPhotos] = useState([]);
 
-  useEffect(() => {
+  const fetchAndSetPhotos = () => {
     fetch('https://jsonplaceholder.typicode.com/photos')
       .then((response) => response.json())
       .then((data) => {
         const photos = data.splice(0, 25);
         setPhotos(photos);
       });
+  };
+
+  useEffect(() => {
+    fetchAndSetPhotos();
   }, []);
 
   return (
