@@ -1,5 +1,6 @@
+//This component is used to draw attention to some content or information
 const Jumbotron = ({ title }) => (
-  <div className="jumbotron bg-dark py-4 mb-5">
+  <div className="Jumbotron bg-dark py-4">
     <h1 className="text-light">{title}</h1>
   </div>
 );
