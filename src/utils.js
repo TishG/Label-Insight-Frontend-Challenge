@@ -1,4 +1,4 @@
-// Fetch data from an API
+// Fetches data from an API
 // Paramaters: url - the resource to access and request data from
 // Returns: the requested data object
 // Note: Handle or catch errors when calling this function
@@ -9,7 +9,7 @@ export const fetchData = async (url) => {
   return photos;
 };
 
-// Check to see if the data already exists in localStorage
+// Checks to see if the data already exists in localStorage
 // Paramaters: name - the title of the data
 // Returns: true or false
 export const isSaved = (name) => localStorage.getItem(name) !== null;
@@ -25,5 +25,7 @@ export const getSaved = (name) =>
 // // name - the title of the data
 // // data - the value to save
 // Returns: undefined
-export const setSaved = (name, data) =>
+export const setSaved = (name, data) => {
   localStorage.setItem(name, JSON.stringify(data));
+  return null;
+};

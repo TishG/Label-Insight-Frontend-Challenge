@@ -1,5 +1,3 @@
-// This component is used in place of data coming from am API
-// Display this component when fetching data from an API fails
 const Error = () => (
   <div
     className="Error alert alert-dismissible fade show alert-danger d-flex justify-content-center align-items-center"

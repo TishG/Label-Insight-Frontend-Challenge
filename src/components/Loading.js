@@ -1,5 +1,3 @@
-// This component is used in place of data coming from am API
-// Display this component while data is being fetched
 const Loading = () => (
   <div className="Loading container">
     <div className="spinner-grow text-success" role="status">
