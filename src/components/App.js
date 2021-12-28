@@ -9,6 +9,7 @@ import { fetchData, isSaved, getSaved, setSaved } from '../utils';
 
 import './App.css';
 
+import Image from './Image';
 import Jumbotron from './Jumbotron';
 import Loading from './Loading';
 import Error from './Error';
@@ -97,33 +98,25 @@ const App = () => {
     setShowForm(false);
     return false;
   };
-  console.log(imageDescription, !isTyping, !showForm);
+
   return (
     <div className="App">
       <Jumbotron title="My Image Gallery" />
 
+      {/* image grid */}
       {(!error && !isLoaded && <Loading />) ||
         ((error || (isLoaded && images.length === 0)) && <Error />) ||
         (!error && isLoaded && images.length > 0 && (
           <div className="gallery container mt-5">
             <div className="grid">
               {images.map(({ title, thumbnailUrl, url }, index) => (
-                <button
-                  onClick={() => handleTileClick(title, url)}
+                <Image
                   key={title || index}
-                  type="button"
-                  className="btn p-0"
-                  data-bs-toggle="modal"
-                  data-bs-target={`#${IMAGE_MODAL}`}
-                >
-                  {(thumbnailUrl && (
-                    <img
-                      src={thumbnailUrl}
-                      className="img-thumbnail border g-col"
-                      alt={title || 'Title Unavailable'}
-                    />
-                  )) || <div>Image Unavailable</div>}
-                </button>
+                  title={title}
+                  thumbnailUrl={thumbnailUrl}
+                  url={url}
+                  handleClick={handleTileClick}
+                />
               ))}
             </div>
           </div>
@@ -184,7 +177,7 @@ const App = () => {
                     </label>
                     <textarea
                       onChange={(e) => handleChange(e)}
-                      placeholder="At the Negril beach in Jamiaica with my family on a sunny, June day."
+                      placeholder="Relaxing on the beach with purple sunglasses on. It's a sunny, june day."
                       className="form-control mb-1"
                       id={DESCRIPTION_FORM_CONTROL}
                       rows="3"
