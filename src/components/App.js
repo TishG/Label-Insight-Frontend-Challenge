@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react';
 
+import {
+  DESCRIPTIONS,
+  IMAGE_MODAL,
+  DESCRIPTION_FORM_CONTROL,
+} from '../consts';
+import { fetchData, isSaved, getSaved, setSaved } from '../utils';
+
 import './App.css';
 
 import Jumbotron from './Jumbotron';
@@ -7,32 +14,31 @@ import Loading from './Loading';
 import Error from './Error';
 
 const App = () => {
-  const [photos, setPhotos] = useState([]);
+  const [images, setImages] = useState([]);
   const [modal, setModal] = useState({
-    title: '',
-    src: '',
-    description: '',
+    ImageTitle: '',
+    imageUrl: '',
+    imageDescription: '',
   });
+  const [typedDescription, setTypedDescription] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
-  const fetchAndSetPhotos = async () => {
+  // extracted state
+  const { imageTitle, imageUrl, imageDescription } = modal;
+
+  // Fetches photos from the API and then sets state, handles loading and error states
+  const handleFetchImages = async () => {
     try {
-      if (localStorage.getItem('photos')) {
-        console.log('getting from local sotrage');
-        const photos = localStorage.getItem('photos');
-        setPhotos(JSON.parse(photos));
-      } else {
-        const response = await fetch(
-          'https://jsonplaceholder.typicode.com/photos',
-        );
-        const data = await response.json();
-        const photos = await data.splice(0, 25);
-        setPhotos(photos);
-        localStorage.setItem('photos', JSON.stringify(photos));
-      }
+      // Want to fetch everytime in case any 1 or more images from the API change
+      // Another option would be to compare the saved photos from local storage with the one from the API but that would amount to the same time complexity or more (if you also need to add the changed data to both local storage and state)
+      const fetchedImages = await fetchData(
+        'https://jsonplaceholder.typicode.com/photos',
+      );
+
+      setImages(fetchedImages);
       setIsLoaded(true);
     } catch (err) {
       setError(true);
@@ -40,73 +46,83 @@ const App = () => {
     }
   };
 
-  const handleTileClick = (photo) => {
-    const savedDescriptions = localStorage.getItem('descriptions');
-    const descriptions =
-      savedDescriptions && JSON.parse(savedDescriptions);
-    const modalDescription = descriptions[photo.title] || '';
-
-    const selectedPhoto = {
-      title: photo.title,
-      src: photo.url,
-      description: modalDescription,
-    };
-
-    setModal(selectedPhoto);
-    console.log(modalDescription);
-  };
-
   useEffect(() => {
-    fetchAndSetPhotos();
+    handleFetchImages();
   }, []);
 
-  const handleChange = (e) => {
-    setIsTyping(true);
-    setModal({ ...modal, description: e.target.value });
+  // Opens the modal and sets the modal data
+  const handleTileClick = (title, url) => {
+    const imageDescriptions =
+      isSaved(DESCRIPTIONS) && getSaved(DESCRIPTIONS);
+    const description = imageDescriptions[title] || '';
+    const selectedImage = {
+      imageTitle: title,
+      imageUrl: url,
+      imageDescription: description,
+    };
+
+    setModal(selectedImage);
   };
 
-  const handleSave = (e) => {
-    const savedDescriptions = localStorage.getItem('descriptions');
-    const descriptions =
-      (savedDescriptions && JSON.parse(savedDescriptions)) || {};
+  // shows the form when user clicks to edit or add a description
+  const handleShowForm = () => {
+    setTypedDescription(imageDescription);
+    setShowForm(true);
+  };
 
-    descriptions[modal.title] = modal.description;
-    localStorage.setItem(
-      'descriptions',
-      JSON.stringify(descriptions),
-    );
+  // Updates the modal description as the user types
+  const handleChange = (e) => {
+    setIsTyping(true);
+    setTypedDescription(e.target.value);
+    setIsTyping(false);
+  };
+
+  // Adds the description to the descriptions object in local storage or
+  // Creates a descriptions object and saves to localStorage
+  // Closes the form when done
+  const handleSave = () => {
+    const { imageTitle } = modal;
+    const descriptions = isSaved(DESCRIPTIONS)
+      ? getSaved(DESCRIPTIONS)
+      : {};
+    descriptions[imageTitle] = typedDescription;
+    setModal({ ...modal, imageDescription: typedDescription });
+    setSaved(DESCRIPTIONS, descriptions);
     setIsTyping(false);
     setShowForm(false);
   };
 
+  // Closes the form without saving
   const handleCancelForm = () => {
-    setModal({ ...modal, description: '' });
     setShowForm(false);
+    return false;
   };
-  console.log({ description: modal.description }, isTyping);
+  console.log(imageDescription, !isTyping, !showForm);
   return (
     <div className="App">
-      <Jumbotron title="My Photo Gallery" />
+      <Jumbotron title="My Image Gallery" />
 
       {(!error && !isLoaded && <Loading />) ||
-        ((error || (isLoaded && photos.length === 0)) && <Error />) ||
-        (!error && isLoaded && photos.length > 0 && (
+        ((error || (isLoaded && images.length === 0)) && <Error />) ||
+        (!error && isLoaded && images.length > 0 && (
           <div className="gallery container mt-5">
             <div className="grid">
-              {photos.map((photo) => (
+              {images.map(({ title, thumbnailUrl, url }, index) => (
                 <button
-                  onClick={() => handleTileClick(photo)}
-                  key={photo.title}
+                  onClick={() => handleTileClick(title, url)}
+                  key={title || index}
                   type="button"
                   className="btn p-0"
                   data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
+                  data-bs-target={`#${IMAGE_MODAL}`}
                 >
-                  <img
-                    src={photo?.thumbnailUrl}
-                    className="img-thumbnail border g-col"
-                    alt={photo.title}
-                  />
+                  {(thumbnailUrl && (
+                    <img
+                      src={thumbnailUrl}
+                      className="img-thumbnail border g-col"
+                      alt={title || 'Title Unavailable'}
+                    />
+                  )) || <div>Image Unavailable</div>}
                 </button>
               ))}
             </div>
@@ -115,17 +131,15 @@ const App = () => {
 
       <div
         className="modal fade"
-        id="exampleModal"
+        id={IMAGE_MODAL}
         tabIndex="-1"
-        aria-labelledby="exampleModalLabel"
+        aria-labelledby="imageModalLabel"
         aria-hidden="true"
       >
         <div className="modal-dialog">
           <div className="modal-content">
             <div className="modal-header">
-              <h5 className="modal-title" id="exampleModalLabel">
-                {modal.title}
-              </h5>
+              <h5 className="modal-title">{imageTitle}</h5>
               <button
                 type="button"
                 className="btn-close"
@@ -135,18 +149,27 @@ const App = () => {
             </div>
             <div className="modal-body">
               <img
-                src={modal.src}
+                src={imageUrl}
                 className="img-fluid"
-                alt={modal.title}
+                alt={imageTitle}
               />
-              {(modal.description && !isTyping && (
-                <div className="description">{modal.description}</div>
-              )) ||
-                (!modal.description && !showForm && (
+              {(imageDescription && !isTyping && !showForm && (
+                <div className="description">
+                  <div>{imageDescription}</div>
                   <button
                     type="button"
                     className="btn btn-primary mt-1"
-                    onClick={() => setShowForm(true)}
+                    onClick={() => handleShowForm()}
+                  >
+                    Edit description
+                  </button>
+                </div>
+              )) ||
+                (!imageDescription && !showForm && (
+                  <button
+                    type="button"
+                    className="btn btn-primary mt-1"
+                    onClick={() => handleShowForm()}
                   >
                     Add a description
                   </button>
@@ -154,7 +177,7 @@ const App = () => {
                 (showForm && (
                   <div className="mb-3">
                     <label
-                      htmlFor="exampleFormControlTextarea1"
+                      htmlFor={DESCRIPTION_FORM_CONTROL}
                       className="form-label"
                     >
                       Description
@@ -163,8 +186,9 @@ const App = () => {
                       onChange={(e) => handleChange(e)}
                       placeholder="At the Negril beach in Jamiaica with my family on a sunny, June day."
                       className="form-control mb-1"
-                      id="exampleFormControlTextarea1"
+                      id={DESCRIPTION_FORM_CONTROL}
                       rows="3"
+                      value={typedDescription || null}
                     ></textarea>
                     <div className="d-flex justify-content-end">
                       <button
@@ -192,9 +216,6 @@ const App = () => {
                 data-bs-dismiss="modal"
               >
                 Close
-              </button>
-              <button type="button" className="btn btn-primary">
-                Save changes
               </button>
             </div>
           </div>
