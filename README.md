@@ -7,4 +7,4 @@ This application displays a 5x5 grid of 25 images fetched from the JSON Placehol
 ### Getting started
 Run `npm install` and then `npm start`
 
-#### Includes test coverage. Please run `npm test`.
+Includes test coverage. Please run `npm test`.
