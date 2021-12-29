@@ -1,11 +1,14 @@
 {
   "name": "label-insight-fe-challenge",
   "version": "0.1.0",
+  "engines": {
+    "node": "16.13.1"
+  },
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.1",
+    "@emotion/babel-preset-css-prop": "^11.2.0",
+    "@emotion/react": "^11.7.1",
     "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
     "classnames": "^2.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -15,8 +18,11 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "testEnvironment": "jsdom"
   },
   "eslintConfig": {
     "extends": [
@@ -35,5 +41,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.1",
+    "@testing-library/user-event": "^13.5.0",
+    "jest": "^27.4.5"
   }
 }

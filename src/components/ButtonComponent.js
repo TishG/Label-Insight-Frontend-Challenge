@@ -5,6 +5,7 @@ const ButtonComponent = ({
   classNames,
   type,
   name,
+  dataTestId,
 }) => (
   <button
     type={type || 'button'}
@@ -12,6 +13,7 @@ const ButtonComponent = ({
     data-bs-dismiss={dataBSDismiss || null}
     aria-label={ariaLabel || null}
     onClick={onClick || null}
+    data-testid={dataTestId || null}
   >
     {name || null}
   </button>

@@ -18,46 +18,50 @@ const App = () => {
   });
   const [typedDescription, setTypedDescription] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isError, setIsError] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
   // extracted state
   const { imageTitle, imageUrl, imageDescription } = modal;
 
   // compouted state
-  const isLoading = !error && !isLoaded;
-  const isError = error || (isLoaded && images.length === 0);
-  const isSuccess = !error && isLoaded && images.length > 0;
-
-  // Fetches photos from the API and then sets state, handles loading and error states
-  const handleFetchImages = async () => {
-    try {
-      // Want to fetch everytime in case any 1 or more images from the API change
-      // Another option could be to compare the saved photos from local storage with the ones from the API but that would amount to the same time complexity or more (if you also need to add the changed data to both local storage and state)
-      const fetchedImages = await fetchData(
-        'https://jsonplaceholder.typicode.com/photos',
-      );
-
-      setImages(fetchedImages);
-      setIsLoaded(true);
-    } catch (err) {
-      setError(true);
-      console.error(err.message);
-    }
-    return null;
-  };
+  const isSuccess = !isError && !isLoading && images.length > 0;
+  const noImagesFetched = !isLoading && images.length === 0;
 
   // Fetches and handles the images, error, and loading state on inital render
   useEffect(() => {
+    // We want to prevent this component from fetching the data while it is unmounted
+    let unmounted = false;
+
+    const handleFetchImages = async () => {
+      try {
+        // Want to fetch everytime in case any 1 or more images from the API change
+        // Another option could be to compare the saved photos from local storage with the ones from the API but that would amount to the same time complexity or more (if you also need to add the changed data to both local storage and state)
+        const fetchedImages = await fetchData(
+          'https://jsonplaceholder.typicode.com/photos',
+        );
+
+        !unmounted && setImages(fetchedImages);
+      } catch (err) {
+        !unmounted && setIsError(true);
+        console.error(err.message);
+      }
+      !unmounted && setIsLoading(false);
+    };
     handleFetchImages();
+
+    return () => {
+      unmounted = true;
+    };
   }, []);
 
   // Opens the modal and sets the modal data
   const handleTileClick = (title, url) => {
     const imageDescriptions =
       isSaved(DESCRIPTIONS) && getSaved(DESCRIPTIONS);
-    const description = imageDescriptions[title] || '';
+    const description =
+      (imageDescriptions && imageDescriptions[title]) || '';
     const selectedImage = {
       imageTitle: title,
       imageUrl: url,
@@ -65,14 +69,12 @@ const App = () => {
     };
 
     setModal(selectedImage);
-    return null;
   };
 
   // shows the form when user clicks to edit or add a description
   const handleShowForm = () => {
     setTypedDescription(imageDescription);
     setShowForm(true);
-    return null;
   };
 
   // Updates the modal description as the user types
@@ -80,7 +82,6 @@ const App = () => {
     setIsTyping(true);
     setTypedDescription(e.target.value);
     setIsTyping(false);
-    return null;
   };
 
   // Adds the description to the descriptions object in local storage or
@@ -96,13 +97,11 @@ const App = () => {
     setSaved(DESCRIPTIONS, descriptions);
     setIsTyping(false);
     setShowForm(false);
-    return null;
   };
 
   // Closes the form without saving
   const handleCancelForm = () => {
     setShowForm(false);
-    return null;
   };
 
   return (
@@ -110,7 +109,7 @@ const App = () => {
       <Jumbotron title="My Image Gallery" />
 
       {(isLoading && <Loading />) ||
-        (isError && <Error />) ||
+        ((isError || noImagesFetched) && <Error />) ||
         (isSuccess && (
           <FivebyFiveGrid
             images={images}

@@ -30,6 +30,7 @@ const Modal = ({
             classNames={classNames('btn-close')}
             dataBSDismiss="modal"
             ariaLabel="Close"
+            dataTestId="xClose"
           />
         </div>
         <div className="modal-body">
