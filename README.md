@@ -5,6 +5,6 @@
 This application displays a 5x5 grid of 25 images fetched from the JSON Placeholder API. Click on an image to see more details. Add or edit a description about the image.
 
 ### Getting started
-Run `npm install`and then `npm start`
+Run `npm install` and then `npm start`
 
-*Includes test coverage. Please run `npm test`.*
+#### Includes test coverage. Please run `npm test`.
