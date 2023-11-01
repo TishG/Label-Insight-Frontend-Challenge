@@ -9,11 +9,6 @@ export const fetchData = async (url) => {
   return photos;
 };
 
-// Checks to see if the data already exists in localStorage
-// Paramaters: name - the title of the data
-// Returns: true or false
-export const isSaved = (name) => localStorage.getItem(name) !== null;
-
 // Gets saved data from local storage and converts the string to an object
 // Paramaters: name - the title of the data
 // Returns: data object

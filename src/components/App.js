@@ -31,9 +31,6 @@ const App = () => {
 
   // Fetches and handles the images, error, and loading state on inital render
   useEffect(() => {
-    // We want to prevent this component from fetching the data while it is unmounted
-    let unmounted = false;
-
     const handleFetchImages = async () => {
       try {
         // Want to fetch everytime in case any 1 or more images from the API change
@@ -42,26 +39,22 @@ const App = () => {
           'https://jsonplaceholder.typicode.com/photos',
         );
 
-        !unmounted && setImages(fetchedImages);
+        setImages(fetchedImages);
       } catch (err) {
-        !unmounted && setIsError(true);
+        setIsError(true);
         console.error(err.message);
       }
-      !unmounted && setIsLoading(false);
+      setIsLoading(false);
     };
     handleFetchImages();
-
-    return () => {
-      unmounted = true;
-    };
   }, []);
 
   // Opens the modal and sets the modal data
   const handleTileClick = (title, url) => {
-    const imageDescriptions =
-      isSaved(DESCRIPTIONS) && getSaved(DESCRIPTIONS);
-    const description =
-      (imageDescriptions && imageDescriptions[title]) || '';
+    const imageDescriptions = getSaved(DESCRIPTIONS);
+    const description = imageDescriptions
+      ? imageDescriptions[title]
+      : '';
     const selectedImage = {
       imageTitle: title,
       imageUrl: url,
@@ -89,12 +82,14 @@ const App = () => {
   // Closes the form when done
   const handleSave = () => {
     const { imageTitle } = modal;
-    const descriptions = isSaved(DESCRIPTIONS)
-      ? getSaved(DESCRIPTIONS)
-      : {};
-    descriptions[imageTitle] = typedDescription;
+    const descriptions = getSaved(DESCRIPTIONS) ?? {};
+    const newDescriptions = {
+      ...descriptions,
+      [imageTitle]: typedDescription,
+    };
+
     setModal({ ...modal, imageDescription: typedDescription });
-    setSaved(DESCRIPTIONS, descriptions);
+    setSaved(DESCRIPTIONS, newDescriptions);
     setIsTyping(false);
     setShowForm(false);
   };

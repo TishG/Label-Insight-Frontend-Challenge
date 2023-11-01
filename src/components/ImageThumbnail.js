@@ -13,13 +13,15 @@ const ImageThumbnail = ({
     data-bs-toggle="modal"
     data-bs-target={`#${IMAGE_MODAL}`}
   >
-    {(thumbnailUrl && (
+    {thumbnailUrl ? (
       <img
         src={thumbnailUrl}
         className="img-thumbnail border p-0"
         alt={title || 'Title Unavailable'}
       />
-    )) || <div>Image Unavailable</div>}
+    ) : (
+      <div>Image Unavailable</div>
+    )}
   </button>
 );
 
