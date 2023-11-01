@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 import { DESCRIPTIONS } from '../consts';
-import { fetchData, isSaved, getSaved, setSaved } from '../utils';
+import { fetchData, getSaved, setSaved } from '../utils';
 
 import Modal from './Modal';
 import Jumbotron from './Jumbotron';
