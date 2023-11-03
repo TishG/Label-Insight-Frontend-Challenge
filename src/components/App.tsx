@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 
 import { DESCRIPTIONS } from '../consts';
 import { fetchData, getSaved, setSaved } from '../utils';
@@ -9,10 +9,16 @@ import FivebyFiveGrid from './FivebyFiveGrid';
 import Loading from './Loading';
 import Error from './Error';
 
+interface Image {
+  title: string;
+  thumbnailUrl: string;
+  url: string;
+}
+
 const App = () => {
-  const [images, setImages] = useState([]);
+  const [images, setImages] = useState<Array<Image>>([]);
   const [modal, setModal] = useState({
-    ImageTitle: '',
+    imageTitle: '',
     imageUrl: '',
     imageDescription: '',
   });
@@ -40,9 +46,13 @@ const App = () => {
         );
 
         setImages(fetchedImages);
-      } catch (err) {
+      } catch (error) {
         setIsError(true);
-        console.error(err.message);
+        console.error(
+          error instanceof Error
+            ? (error as Error).message
+            : 'An error occured',
+        );
       }
       setIsLoading(false);
     };
@@ -50,7 +60,7 @@ const App = () => {
   }, []);
 
   // Opens the modal and sets the modal data
-  const handleTileClick = (title, url) => {
+  const handleTileClick = (title: string, url: string): void => {
     const imageDescriptions = getSaved(DESCRIPTIONS);
     const description = imageDescriptions
       ? imageDescriptions[title]
@@ -65,13 +75,13 @@ const App = () => {
   };
 
   // shows the form when user clicks to edit or add a description
-  const handleShowForm = () => {
+  const handleShowForm = (): void => {
     setTypedDescription(imageDescription);
     setShowForm(true);
   };
 
   // Updates the modal description as the user types
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setIsTyping(true);
     setTypedDescription(e.target.value);
     setIsTyping(false);
@@ -80,7 +90,7 @@ const App = () => {
   // Adds the description to the descriptions object in local storage or
   // Creates a descriptions object and saves to localStorage
   // Closes the form when done
-  const handleSave = () => {
+  const handleSave = (): void => {
     const { imageTitle } = modal;
     const descriptions = getSaved(DESCRIPTIONS) ?? {};
     const newDescriptions = {
@@ -95,7 +105,7 @@ const App = () => {
   };
 
   // Closes the form without saving
-  const handleCancelForm = () => {
+  const handleCancelForm = (): void => {
     setShowForm(false);
   };
 

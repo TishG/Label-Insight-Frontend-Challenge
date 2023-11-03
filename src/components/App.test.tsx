@@ -1,4 +1,6 @@
-import * as React from 'react';
+// <reference path="jest-dom-matchers.d.ts" />
+
+import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
 import {
   render,
@@ -9,15 +11,23 @@ import user from '@testing-library/user-event';
 import * as localStorageUtils from '../utils';
 import App from './App';
 
-jest.mock('../utils');
+jest.mock('../utils', () => {
+  return {
+    fetchData: jest.fn(),
+    getSaved: jest.fn(),
+    setSaved: jest.fn(),
+  };
+});
+
+const mockedFetchData = localStorageUtils.fetchData as jest.Mock;
 
 describe('App', () => {
-  let imageThumbnail1;
-  let imageThumbnail2;
-  let addDescriptionBtn;
+  let imageThumbnail1: HTMLElement;
+  let imageThumbnail2: HTMLElement;
+  let addDescriptionBtn: HTMLElement;
   const description = 'At the Los Angelos airport';
   beforeEach(async () => {
-    localStorageUtils.fetchData.mockResolvedValue([
+    mockedFetchData.mockResolvedValue([
       {
         albumId: 1,
         id: 1,
@@ -43,7 +53,9 @@ describe('App', () => {
 
     render(<App />);
 
-    await waitForElementToBeRemoved(() => screen.queryAllByText(/loading/i));
+    await waitForElementToBeRemoved(() =>
+      screen.queryAllByText(/loading/i),
+    );
 
     expect(screen.getByAltText(/one/i)).toBeInTheDocument();
     expect(screen.getByAltText(/two/i)).toBeInTheDocument();
@@ -93,7 +105,7 @@ describe('App', () => {
 
     // check that description was saved and then open form to edit description
     expect(screen.getByText(description)).toBeInTheDocument();
-    
+
     user.click(screen.getByText(/edit description/i));
     // clear the description
     user.clear(screen.getByLabelText('Description'));
@@ -102,8 +114,9 @@ describe('App', () => {
 
     // verify that the description is deleted
     expect(screen.queryByText(description)).not.toBeInTheDocument();
-    // using addDescriptionBtn variable fails so I am manually testing here, unsure why
-    expect(screen.getByText(/add a description/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/add a description/i),
+    ).toBeInTheDocument();
   });
 
   test('it should not save the editied description if form is cancelled before saving', async () => {

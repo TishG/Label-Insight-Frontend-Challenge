@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Error = () => (
   <div
     className="Error alert alert-dismissible fade show alert-danger d-flex justify-content-center align-items-center"

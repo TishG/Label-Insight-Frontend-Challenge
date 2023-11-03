@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Loading = () => (
   <div className="Loading container d-flex justify-content-center">
     <div className="spinner-grow text-success" role="status">

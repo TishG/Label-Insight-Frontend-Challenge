@@ -1,9 +1,23 @@
+import React, { ChangeEvent } from 'react';
 import classNames from 'classnames';
 import { IMAGE_MODAL, DESCRIPTION_FORM_CONTROL } from '../consts';
 
 import ButtonComponent from './ButtonComponent';
 
-const Modal = ({
+interface Props {
+  imageTitle: string;
+  imageUrl: string;
+  imageDescription: string;
+  isTyping: boolean;
+  showForm: boolean;
+  typedDescription: string;
+  handleShowForm: () => void;
+  handleChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
+  handleCancelForm: () => void;
+  handleSave: () => void;
+}
+
+const Modal: React.FC<Props> = ({
   imageTitle,
   imageUrl,
   imageDescription,
@@ -18,7 +32,7 @@ const Modal = ({
   <div
     className="modal fade"
     id={IMAGE_MODAL}
-    tabIndex="-1"
+    tabIndex={-1}
     aria-labelledby="imageModalLabel"
     aria-hidden="true"
   >
@@ -69,11 +83,11 @@ const Modal = ({
                   Description
                 </label>
                 <textarea
-                  onChange={(e) => handleChange(e)}
+                  onChange={handleChange}
                   placeholder="Relaxing on the beach with purple sunglasses on. It's a sunny, june day."
                   className="form-control mb-1"
                   id={DESCRIPTION_FORM_CONTROL}
-                  rows="3"
+                  rows={3}
                   value={typedDescription || undefined}
                 ></textarea>
                 <div className="d-flex justify-content-end">
@@ -84,7 +98,7 @@ const Modal = ({
                     name="Cancel"
                   />
                   <ButtonComponent
-                    type="submit"
+                    buttonType="submit"
                     classNames={classNames('btn-primary')}
                     onClick={handleSave}
                     ariaLabel="Save Description"

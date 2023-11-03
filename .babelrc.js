@@ -5,6 +5,7 @@ module.exports = {
   presets: [
     ['@babel/preset-env', { modules: isTest ? 'commonjs' : false }],
     '@babel/preset-react',
+    '@babel/preset-typescript',
     [
       '@emotion/babel-preset-css-prop',
       {

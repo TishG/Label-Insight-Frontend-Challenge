@@ -1,6 +1,14 @@
+import React from 'react';
 import { IMAGE_MODAL } from '../consts';
 
-const ImageThumbnail = ({
+interface Props {
+  title: string;
+  thumbnailUrl: string;
+  url: string;
+  handleClick: (title: string, url: string) => void;
+}
+
+const ImageThumbnail: React.FC<Props> = ({
   title,
   thumbnailUrl,
   url,

@@ -1,6 +1,21 @@
+import React from 'react';
 import ImageThumbnail from './ImageThumbnail';
 
-const FivebyFiveGrid = ({ images, handleTileClick }) => (
+type Image = {
+  title: string;
+  thumbnailUrl: string;
+  url: string;
+};
+
+interface Props {
+  images: Array<Image>;
+  handleTileClick: (title: string, url: string) => void;
+}
+
+const FivebyFiveGrid: React.FC<Props> = ({
+  images,
+  handleTileClick,
+}) => (
   <div
     className="FiveByFiveGrid my-5 mx-auto"
     style={{ maxWidth: '700px' }}
